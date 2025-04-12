@@ -1,33 +1,66 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
+Route::get('/', 'HomeController@index')->name('home');
+Route::get('speaker/{speaker}', 'HomeController@view')->name('speaker');
+Route::redirect('/home', '/admin');
+Auth::routes(['register' => false]);
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'middleware' => ['auth']], function () {
+    Route::get('/', 'HomeController@index')->name('home');
+    // Permissions
+    Route::delete('permissions/destroy', 'PermissionsController@massDestroy')->name('permissions.massDestroy');
+    Route::resource('permissions', 'PermissionsController');
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-Route::get('/', [HomeController::class,'home'])->middleware('guest')->name('home');
-Route::get('/signup',[UserController::class,'signin']);
-Route::get('/signin',[UserController::class,'signup'])->middleware('guest')->name('signin');
-Route::post('/login',[UserController::class,'login'])->middleware('guest');
-Route::get('/logout',[UserController::class,'logout']);
-Route::post('/register',[UserController::class,'register']);
-Route::post('/sendmessage',[ContactController::class,'sendmessage']);
-Route::get('/contact', [ContactController::class,'showForm']);
-Route::middleware(['auth','admin'])->group(function(){
-    Route::get('/admin', [AdminController::class,'admin'])->middleware('auth');
+    // Roles
+    Route::delete('roles/destroy', 'RolesController@massDestroy')->name('roles.massDestroy');
+    Route::resource('roles', 'RolesController');
+
+    // Users
+    Route::delete('users/destroy', 'UsersController@massDestroy')->name('users.massDestroy');
+    Route::resource('users', 'UsersController');
+
+    // Settings
+    Route::delete('settings/destroy', 'SettingsController@massDestroy')->name('settings.massDestroy');
+    Route::resource('settings', 'SettingsController');
+
+    // Speakers
+    Route::delete('speakers/destroy', 'SpeakersController@massDestroy')->name('speakers.massDestroy');
+    Route::post('speakers/media', 'SpeakersController@storeMedia')->name('speakers.storeMedia');
+    Route::resource('speakers', 'SpeakersController');
+
+    // Schedules
+    Route::delete('schedules/destroy', 'ScheduleController@massDestroy')->name('schedules.massDestroy');
+    Route::resource('schedules', 'ScheduleController');
+
+    // Venues
+    Route::delete('venues/destroy', 'VenuesController@massDestroy')->name('venues.massDestroy');
+    Route::post('venues/media', 'VenuesController@storeMedia')->name('venues.storeMedia');
+    Route::resource('venues', 'VenuesController');
+
+    // Hotels
+    Route::delete('hotels/destroy', 'HotelsController@massDestroy')->name('hotels.massDestroy');
+    Route::post('hotels/media', 'HotelsController@storeMedia')->name('hotels.storeMedia');
+    Route::resource('hotels', 'HotelsController');
+
+    // Galleries
+    Route::delete('galleries/destroy', 'GalleriesController@massDestroy')->name('galleries.massDestroy');
+    Route::post('galleries/media', 'GalleriesController@storeMedia')->name('galleries.storeMedia');
+    Route::resource('galleries', 'GalleriesController');
+
+    // Sponsors
+    Route::delete('sponsors/destroy', 'SponsorsController@massDestroy')->name('sponsors.massDestroy');
+    Route::post('sponsors/media', 'SponsorsController@storeMedia')->name('sponsors.storeMedia');
+    Route::resource('sponsors', 'SponsorsController');
+
+    // Faqs
+    Route::delete('faqs/destroy', 'FaqsController@massDestroy')->name('faqs.massDestroy');
+    Route::resource('faqs', 'FaqsController');
+
+    // Amenities
+    Route::delete('amenities/destroy', 'AmenitiesController@massDestroy')->name('amenities.massDestroy');
+    Route::resource('amenities', 'AmenitiesController');
+
+    // Prices
+    Route::delete('prices/destroy', 'PricesController@massDestroy')->name('prices.massDestroy');
+    Route::resource('prices', 'PricesController');
 });
